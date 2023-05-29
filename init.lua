@@ -720,7 +720,7 @@ vim.keymap.set('n', '<leader>ds', vim.diagnostic.setqflist)
 vim.keymap.set('n', '<leader>b', build_go_files)
 
 -- disable diagnostics, I didn't like them
-vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+-- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 
 -- Go uses gofmt, which uses tabs for indentation and spaces for aligment.
 -- Hence override our indentation rules.
