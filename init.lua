@@ -206,6 +206,8 @@ require("lazy").setup({
   -- {
   --   "neoclide/coc.nvim", branch = 'release', run = 'yarn install --frozen-lockfile' 
   -- },
+  --
+  {'hashivim/vim-terraform'},
 
   -- fuzzy finder framework
   {
