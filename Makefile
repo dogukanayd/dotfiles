@@ -20,6 +20,9 @@ sync:
 	[ ! -f ~/.zshrc] || rm -f ~/.zshrc
 	ln -sf $(PWD)/zshrc ~/.zshrc
 
+	[ ! -f ~/.alacritty.toml] || rm -f ~/.alacritty.toml
+	ln -sf $(PWD)/alacritty.toml ~/.alacritty.toml
+
 clean:
 	rm -f ~/.vimrc 
 	rm -f ~/.config/nvim/init.lua
