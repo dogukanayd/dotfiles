@@ -152,31 +152,18 @@ vim.cmd([[colorscheme gruvbox]])
 -- Additional Key Mappings
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
 vim.keymap.set('n', '<leader>gs', vim.cmd.Git)
+-- Better split switching
+vim.keymap.set('', '<C-j>', '<C-W>j')
+vim.keymap.set('', '<C-k>', '<C-W>k')
+vim.keymap.set('', '<C-h>', '<C-W>h')
+vim.keymap.set('', '<C-l>', '<C-W>l')
+
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 -- optionally enable 24-bit colour
 vim.opt.termguicolors = true
-
--- empty setup using defaults
-require("nvim-tree").setup()
-
--- OR setup with some options
-require("nvim-tree").setup({
-  sort = {
-    sorter = "case_sensitive",
-  },
-  view = {
-    width = 30,
-  },
-  renderer = {
-    group_empty = true,
-  },
-  filters = {
-    dotfiles = true,
-  },
-})
 
 -- local function my_on_attach(bufnr)
 --   local api = require "nvim-tree.api"
