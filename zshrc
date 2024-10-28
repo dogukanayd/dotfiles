@@ -69,7 +69,6 @@ eval $(thefuck --alias)
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:/home/dogukanaydogdu/.bin
-
 source $ZSH/oh-my-zsh.sh
 
 export NVM_DIR="$HOME/.nvm"

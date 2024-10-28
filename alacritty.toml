@@ -1,5 +1,8 @@
+[window]
+decorations = "None"
+
 [font]
-size = 12  # Adjust font size to your liking
+size = 13  # Adjust font size to your liking
 
 [font.normal]
 family = "OperatorMono Nerd Font"  # Replace with your preferred font
