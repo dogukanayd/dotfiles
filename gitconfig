@@ -42,6 +42,7 @@
 	editor = nvim
 	quotepath = false
 	excludesfile = /Users/fatih/.gitignore
+  pager = delta
 [credential]
 	helper = osxkeychain
 [github]
@@ -59,3 +60,17 @@
 	rebase = false
 [init]
 	defaultBranch = main
+
+[interactive]
+  diffFilter = deilta -- color-only
+
+[delta]
+  navigate = true # use n and N to move between diff sections
+  side-by-side = true
+
+[merge]
+  cohnflictstyle = diff3
+
+[diff]
+  colorMoved = default
+
