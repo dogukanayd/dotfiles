@@ -1,5 +1,6 @@
 local telescopeBuiltin
 local harpoon
+local nvim_tree_width = 30
 
 -- Leader Key
 vim.g.mapleader = ","
@@ -34,6 +35,17 @@ require('packer').startup(function(use)
                 },
             })
         end,
+    }
+
+
+    -- Vim Markdown
+    use {
+        'preservim/vim-markdown',
+        requires = { 'godlygeek/tabular' },
+    }
+    -- GitHub Copilot
+    use {
+        'github/copilot.vim'
     }
     -- Harpoon
     use {
@@ -153,6 +165,14 @@ vim.keymap.set('', '<C-k>', '<C-W>k')
 vim.keymap.set('', '<C-h>', '<C-W>h')
 vim.keymap.set('', '<C-l>', '<C-W>l')
 
+-- NvimTree keymap for copying a folder
+vim.api.nvim_set_keymap('n', '<leader>cf', [[:lua copy_folder(vim.fn.expand('%:p'), vim.fn.input("Paste to: "))<CR>]], { noremap = true, silent = true }) -- TODO: doesn't work, debug it
+
+-- Key mappings for adjusting NvimTree width
+-- vim.api.nvim_set_keymap('n', '<C-n><Right>', [[:lua set_nvim_tree_width(5)<CR>]], { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap('n', '<C-n><Left>', [[:lua set_nvim_tree_width(-5)<CR>]], { noremap = true, silent = true })
+
+
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -162,6 +182,8 @@ vim.opt.termguicolors = true
 
 vim.keymap.set('n', '<leader>n', ':NvimTreeToggle<CR>', { noremap = true })
 vim.keymap.set('n', '<leader>f', ':NvimTreeFindFile!<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<M-n>', [[:lua EnterResizeMode()<CR>]], { noremap = true, silent = true })
+
 -- LSP-Specific Key Mappings
 vim.api.nvim_create_autocmd('LspAttach', {
     desc = 'LSP actions',
@@ -180,3 +202,47 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
+
+-- Custom Functions
+
+-- Function to copy a folder
+-- @param src: string: The source folder to copy
+function copy_folder(src, dest)
+    local cmd = string.format("cp -r %s %s", vim.fn.shellescape(src), vim.fn.shellescape(dest))
+    os.execute(cmd)
+    print("Folder copied from " .. src .. " to " .. dest)
+end
+
+-- Function to adjust NvimTree width
+-- @param delta: int: The amount to adjust the width by
+function set_nvim_tree_width(delta)
+    -- Find the NvimTree window
+    local view = require("nvim-tree.view")
+    if view.is_visible() then
+        -- Get the current width
+        local width = view.View.width + delta
+        view.View.width = width  -- Update the width setting
+        vim.api.nvim_win_set_width(view.get_winnr(), width)  -- Set the window width directly
+    end
+end
+
+
+-- Function to enable resize mode
+function EnterResizeMode()
+    -- Remap arrow keys for resizing while in resize mode
+    vim.api.nvim_set_keymap('n', '<Left>', [[:lua set_nvim_tree_width(-5)<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '<Right>', [[:lua set_nvim_tree_width(5)<CR>]], { noremap = true, silent = true })
+
+    -- Map Ctrl+n again to exit resize mode and restore original mappings
+    vim.api.nvim_set_keymap('n', '<M-n>', [[:lua ExitResizeMode()<CR>]], { noremap = true, silent = true })
+end
+
+-- Function to exit resize mode
+function ExitResizeMode()
+    -- Restore the original arrow key functionality
+    vim.api.nvim_del_keymap('n', '<Left>')
+    vim.api.nvim_del_keymap('n', '<Right>')
+
+    -- Rebind Ctrl+n to re-enter resize mode
+    vim.api.nvim_set_keymap('n', '<M-n>', [[:lua EnterResizeMode()<CR>]], { noremap = true, silent = true })
+end

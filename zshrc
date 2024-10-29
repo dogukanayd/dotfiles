@@ -57,6 +57,7 @@ alias mockgen="$GOPATH/bin/mockgen"
 alias mockgen-usage="echo mockgen -destination=mock_cache.go -package=cache -source=interface.go"
 alias docker-clean="docker system prune && docker container prune && docker network prune && docker image prune && docker volume prune"
 alias cat="bat"
+alias go="go1.21.1"
 
 # Functions
 weather () {
