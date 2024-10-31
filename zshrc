@@ -1,7 +1,65 @@
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
+ZSH_THEME="bira"
 zstyle ':omz:update' mode auto      # update automatically without asking
 
+# Automatically set up tmux sessions
+if command -v tmux &> /dev/null; then
+    # Check if tmux is already running
+    if [ -z "$TMUX" ]; then
+        # Function to create a session with two horizontal panes and selectively open NeoVim
+        create_session_with_optional_nvim() {
+            local session_name=$1
+            local dir1=$2
+            local dir2=$3
+            local open_nvim_in_first_pane=$4
+
+            # Create the session if it doesn't exist
+            tmux has-session -t "$session_name" 2>/dev/null || {
+                if [ "$open_nvim_in_first_pane" = true ]; then
+                    # Start the first pane with NeoVim in the specified directory
+                    tmux new-session -d -s "$session_name" "cd $dir1 && nvim"
+                else
+                    # Start the first pane as a regular shell in the specified directory
+                    tmux new-session -d -s "$session_name" -c "$dir1"
+                fi
+                # Split the window into two horizontal panes with the second pane as a regular shell
+                tmux split-window -v -t "$session_name" -c "$dir2"
+            }
+        }
+
+        # Create sessions with NeoVim in the first pane only for setup and notes sessions
+        create_session_with_optional_nvim setup "$HOME/dotfiles" "$HOME/dotfiles" true
+        create_session_with_optional_nvim notes "$HOME/notes" "$HOME/notes" true
+        create_session_with_optional_nvim main "$HOME" "$HOME" false
+
+        # Attach to the main session
+        tmux attach-session -t main
+    fi
+fi
+# Automatically set up tmux sessions
+# if command -v tmux &> /dev/null; then
+#     # Check if tmux is already running
+#     if [ -z "$TMUX" ]; then
+#         # Function to create a session with two vertical panes
+#         create_session_with_panes() {
+#             local session_name=$1
+#             # Create the session if it doesn't exist
+#             tmux has-session -t "$session_name" 2>/dev/null || {
+#                 tmux new-session -d -s "$session_name"
+#                 # Split the window into two vertical panes
+#                 tmux split-window -v -t "$session_name"
+#             }
+#         }
+#
+#         # Create sessions with two vertical panes each
+#         create_session_with_panes setup
+#         create_session_with_panes notes
+#         create_session_with_panes main
+#
+#         # Attach to the main session
+#         tmux attach-session -t main
+#     fi
+# fi
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
