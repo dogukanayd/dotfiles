@@ -2,16 +2,16 @@
 size = 13  # Adjust font size to your liking
 
 [font.normal]
-family = "OperatorMono Nerd Font"  # Replace with your preferred font
+family = "JetBrainsMono Nerd Font"  # Replace with your preferred font
 style = "Book"
 
 
 [font.bold]
-family = "OperatorMono Nerd Font"  # Replace with your preferred font
+family = "JetBrainsMono Nerd Font"  # Replace with your preferred font
 style = "Bold"
 
 [font.italic]
-family = "OperatorMono Nerd Font"  # Replace with your preferred font
+family = "JetBrainsMono Nerd Font"  # Replace with your preferred font
 style = "Italic"
 
 [env]

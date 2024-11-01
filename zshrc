@@ -1,5 +1,5 @@
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="bira"
+ZSH_THEME="robbyrussell"
 zstyle ':omz:update' mode auto      # update automatically without asking
 
 # Automatically set up tmux sessions
@@ -113,10 +113,13 @@ alias docker-list='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Ports}}"'
 alias docker-kill='docker kill $(docker ps -q)'
 alias mockgen="$GOPATH/bin/mockgen"
 alias mockgen-usage="echo mockgen -destination=mock_cache.go -package=cache -source=interface.go"
+alias http-usage="echo 'http POST http://example.com/api/endpoint < data.json'"
 alias docker-clean="docker system prune && docker container prune && docker network prune && docker image prune && docker volume prune"
 alias cat="bat"
-alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions"
 
+lsq() {
+    eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions
+}
 # Functions
 weather () {
   city=${1:-5}

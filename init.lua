@@ -176,6 +176,18 @@ require("lazy").setup({
     end,
   },
 
+  -- copilot
+  {
+    'github/copilot.vim',
+    config = function()
+      -- Disable Copilot’s default Tab mapping
+      vim.g.copilot_no_tab_map = true
+
+      -- Set custom key mapping to accept Copilot suggestion
+      vim.api.nvim_set_keymap("i", "<C-l>", 'copilot#Accept("<CR>")', { expr = true, silent = true })
+    end,
+  },
+
   -- markdown
   {
     "iamcco/markdown-preview.nvim",
@@ -217,7 +229,29 @@ require("lazy").setup({
       "nvim-tree/nvim-web-devicons",
     },
     config = function ()
+      local make_entry = require('telescope.make_entry')
+
       require("telescope").setup({
+        defaults = {
+          wrap_results = true,
+          layout_strategy = 'horizontal',
+          path_display = {'absolute'},
+          layout_config = {
+            horizontal = {
+              preview_width = 0.6,
+            },
+            width = 0.9,
+          },
+          entry_maker = function(entry)
+            local display = entry.filename
+            return make_entry.set_default_entry_mt({
+              value = entry,
+              display = display,
+              ordinal = display,
+              filename = entry.filename,
+            })
+          end,
+        },
         extensions = {
           fzf = {
             fuzzy = true,                    -- false will only do exact matching
@@ -550,6 +584,7 @@ require("lazy").setup({
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+
 vim.opt.termguicolors = true -- Enable 24-bit RGB colors
 
 vim.opt.number = true        -- Show line numbers
@@ -579,12 +614,13 @@ vim.opt.autoindent = true -- copy indent from current line when starting a new l
 vim.opt.wrap = true
 
 vim.opt.ruler = true
-vim.opt.colorcolumn = "80"  -- Replace 80 with your preferred column number
+vim.opt.colorcolumn = "120"  -- Replace 120 with your preferred column number
 
 -- This comes first, because we have mappings that depend on leader
 -- With a map leader it's possible to do extra key combinations
 -- i.e: <leader>w saves the current file
 vim.g.mapleader = ','
+
 
 -- Fast saving
 vim.keymap.set('n', '<Leader>w', ':write!<CR>')
