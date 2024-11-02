@@ -118,7 +118,8 @@ alias docker-clean="docker system prune && docker container prune && docker netw
 alias cat="bat"
 
 lsq() {
-    eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions
+  # eza show 1 sub folder
+    eza --color=always --tree --level=2 --long --git --no-filesize --icons=always --no-time --no-user --no-permissions
 }
 # Functions
 weather () {

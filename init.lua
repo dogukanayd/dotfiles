@@ -284,6 +284,8 @@ require("lazy").setup({
 
       require'lspconfig'.terraform_lsp.setup{}
       require'lspconfig'.intelephense.setup{}
+      require'lspconfig'.ts_ls.setup{}
+
       require("lspconfig").gopls.setup({
         capabilities = capabilities,
         flags = { debounce_text_changes = 200 },
