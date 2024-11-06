@@ -58,7 +58,6 @@ end
 --- plugins ---
 ----------------
 require("lazy").setup({
-
   -- colorscheme
   -- { 
   --   "ellisonleao/gruvbox.nvim", 
@@ -70,7 +69,9 @@ require("lazy").setup({
   --     vim.cmd([[colorscheme gruvbox]])
   --   end,
   -- },
-
+  {
+    'jvirtanen/vim-hcl'
+  },
   {
     "rebelot/kanagawa.nvim",
     config = function ()
@@ -94,7 +95,7 @@ require("lazy").setup({
         end,
         theme = "wave",              -- Load "wave" theme when 'background' option is not set
         background = {               -- map the value of 'background' option to a theme
-          dark = "dragon",           -- try "dragon" or "wave"!
+          dark = "wave",           -- try "dragon" or "wave"!
           light = "lotus"
         }, 
       })
@@ -118,6 +119,31 @@ require("lazy").setup({
             }
           }
         }
+      })
+    end,
+  },
+
+  -- terraform formatter
+  {
+    "stevearc/conform.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require("conform").setup({
+        formatters = {
+          hcledit = {
+            command = "hcledit",
+            args = { "fmt", "-f", "terragrunt.hcl", "--update" },
+            stdin = true,
+          },
+        },
+        formatters_by_ft = {
+          hcl = { "hcledit" },
+        },
+        format_on_save = {
+          lsp_fallback = true,
+          async = false,
+          timeout_ms = 500,
+        },
       })
     end,
   },
@@ -345,15 +371,15 @@ require("lazy").setup({
             staticcheck = true,
             directoryFilters = { "-.git", "-node_modules" },
             semanticTokens = false,
-            -- hints = {
-            --   assignVariableTypes = true,
-            --   compositeLiteralFields = true,
-            --   compositeLiteralTypes = true,
-            --   constantValues = true,
-            --   functionTypeParameters = true,
-            --   parameterNames = true,
-            --   rangeVariableTypes = true,
-            -- },
+            hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              compositeLiteralTypes = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
+            },
           },
         },
       })
@@ -752,6 +778,23 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "TermOpen" }, {
     end,
 })
 
+-- Create an augroup to manage the autocommand
+vim.api.nvim_create_augroup('TerraformFmt', { clear = true })
+
+-- Define the autocommand
+vim.api.nvim_create_autocmd('BufWritePost', {
+  group = 'TerraformFmt',
+  pattern = '*.hcl',
+  callback = function()
+    -- Save the current buffer before formatting
+    vim.cmd('write')
+    -- Execute 'terraform fmt' on the current file
+    vim.fn.system('hcledit fmt -f terragrunt.hcl --update' .. vim.fn.shellescape(vim.fn.expand('%:p')))
+    -- Reload the buffer to reflect the formatted changes
+    vim.cmd('edit!')
+  end,
+})
+
 -- Open help window in a vertical split to the right.
 vim.api.nvim_create_autocmd("BufWinEnter", {
     group = vim.api.nvim_create_augroup("help_window_right", {}),
@@ -791,8 +834,8 @@ vim.keymap.set('n', '<leader>tf', ':TestFile -v<CR>', { noremap = true, silent =
 
 -- telescope
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<C-p>', builtin.git_files, {})
-vim.keymap.set('n', '<C-b>', builtin.find_files, {})
+vim.keymap.set('n', '<C-b>', builtin.git_files, {})
+vim.keymap.set('n', '<C-p>', builtin.find_files, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})
@@ -806,6 +849,9 @@ vim.keymap.set('n', '<leader>ds', vim.diagnostic.setqflist)
 
 -- vim-go
 vim.keymap.set('n', '<leader>b', build_go_files)
+
+vim.api.nvim_set_keymap('n', '<leader>cp', [[:let @+=fnamemodify(expand('%'), ':~:.')<CR>]], { noremap = true, silent = true })
+
 
 -- disable diagnostics, I didn't like them
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end

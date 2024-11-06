@@ -116,6 +116,16 @@ alias mockgen-usage="echo mockgen -destination=mock_cache.go -package=cache -sou
 alias http-usage="echo 'http POST http://example.com/api/endpoint < data.json'"
 alias docker-clean="docker system prune && docker container prune && docker network prune && docker image prune && docker volume prune"
 alias cat="bat"
+# alias vimo="nvim $(fzf)"
+
+# Function to cd into a directory selected with fzf
+fcd() {
+    local dir
+    dir=$(find "${1:-.}" -type d \( -name .git -o -name vendor \) -prune -false -o -type d 2>/dev/null | fzf --preview 'ls -l {}')
+    if [[ -n "$dir" ]]; then
+        cd "$dir"
+    fi
+}
 
 lsq() {
   # eza show 1 sub folder
