@@ -36,30 +36,6 @@ if command -v tmux &> /dev/null; then
         tmux attach-session -t main
     fi
 fi
-# Automatically set up tmux sessions
-# if command -v tmux &> /dev/null; then
-#     # Check if tmux is already running
-#     if [ -z "$TMUX" ]; then
-#         # Function to create a session with two vertical panes
-#         create_session_with_panes() {
-#             local session_name=$1
-#             # Create the session if it doesn't exist
-#             tmux has-session -t "$session_name" 2>/dev/null || {
-#                 tmux new-session -d -s "$session_name"
-#                 # Split the window into two vertical panes
-#                 tmux split-window -v -t "$session_name"
-#             }
-#         }
-#
-#         # Create sessions with two vertical panes each
-#         create_session_with_panes setup
-#         create_session_with_panes notes
-#         create_session_with_panes main
-#
-#         # Attach to the main session
-#         tmux attach-session -t main
-#     fi
-# fi
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -68,12 +44,10 @@ fi
 # Uncomment the following line to enable command auto-correction.
 ENABLE_CORRECTION="true"
 
-
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
 DISABLE_UNTRACKED_FILES_DIRTY="true"
-
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -127,11 +101,20 @@ fcd() {
     fi
 }
 
-lsq() {
-  # eza show 1 sub folder
-    eza --color=always --tree --level=2 --long --git --no-filesize --icons=always --no-time --no-user --no-permissions
-}
 # Functions
+lsq() {
+  # Set the default level to 1
+  level=1
+
+  # If an argument is provided, use it as the level
+  if [ -n "$1" ]; then
+    level=$1
+  fi
+
+  # Run the eza command with the specified level
+  eza --color=always --tree --level=$level --long --git --no-filesize --icons=always --no-time --no-user --no-permissions
+}
+
 weather () {
   city=${1:-5}
   curl https://wttr.in/$city

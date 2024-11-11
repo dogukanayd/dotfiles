@@ -59,47 +59,14 @@ end
 ----------------
 require("lazy").setup({
   -- colorscheme
-  -- { 
-  --   "ellisonleao/gruvbox.nvim", 
-  --   priority = 1000, -- make sure to load this before all the other start plugins
-  --   config = function ()
-  --     require("gruvbox").setup({
-  --       -- contrast = "hard"
-  --     })
-  --     vim.cmd([[colorscheme gruvbox]])
-  --   end,
-  -- },
   {
     'jvirtanen/vim-hcl'
   },
   {
-    "rebelot/kanagawa.nvim",
+    'sainnhe/gruvbox-material',
     config = function ()
-      require("kanagawa").setup({
-        compile = false,             -- enable compiling the colorscheme
-        undercurl = true,            -- enable undercurls
-        commentStyle = { italic = true },
-        functionStyle = {},
-        keywordStyle = { italic = true},
-        statementStyle = { bold = true },
-        typeStyle = {},
-        transparent = false,         -- do not set background color
-        dimInactive = false,         -- dim inactive window `:h hl-NormalNC`
-        terminalColors = true,       -- define vim.g.terminal_color_{0,17}
-        colors = {                   -- add/modify theme and palette colors
-          palette = {},
-          theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
-        },
-        overrides = function(colors) -- add/modify highlights
-          return {}
-        end,
-        theme = "wave",              -- Load "wave" theme when 'background' option is not set
-        background = {               -- map the value of 'background' option to a theme
-          dark = "wave",           -- try "dragon" or "wave"!
-          light = "lotus"
-        }, 
-      })
-      vim.cmd([[colorscheme kanagawa]])
+      vim.g.gruvbox_material_background = 'hard'
+      vim.cmd([[colorscheme gruvbox-material]])
     end,
   },
 
@@ -749,12 +716,12 @@ vim.keymap.set('t', '<leader>q', '<C-\\><C-n>:q<cr>')
 vim.keymap.set('t', '<ESC>', '<C-\\><C-n>')
 
 -- Open terminal in vertical and horizontal split
-vim.keymap.set('n', '<leader>tv', '<cmd>vnew term://fish<CR>', { noremap = true })
-vim.keymap.set('n', '<leader>ts', '<cmd>split term://fish<CR>', { noremap = true })
+vim.keymap.set('n', '<leader>tv', '<cmd>vnew term://zsh<CR>', { noremap = true })
+vim.keymap.set('n', '<leader>ts', '<cmd>split term://zsh<CR>', { noremap = true })
 
 -- Open terminal in vertical and horizontal split, inside the terminal
-vim.keymap.set('t', '<leader>tv', '<c-w><cmd>vnew term://fish<CR>', { noremap = true })
-vim.keymap.set('t', '<leader>ts', '<c-w><cmd>split term://fish<CR>', { noremap = true })
+vim.keymap.set('t', '<leader>tv', '<c-w><cmd>vnew term://zsh<CR>', { noremap = true })
+vim.keymap.set('t', '<leader>ts', '<c-w><cmd>split term://zsh<CR>', { noremap = true })
 
 -- mappings to move out from terminal to other views
 vim.keymap.set('t', '<C-h>', '<C-\\><C-n><C-w>h')
@@ -834,8 +801,8 @@ vim.keymap.set('n', '<leader>tf', ':TestFile -v<CR>', { noremap = true, silent =
 
 -- telescope
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<C-b>', builtin.git_files, {})
-vim.keymap.set('n', '<C-p>', builtin.find_files, {})
+vim.keymap.set('n', '<C-p>', builtin.git_files, {})
+vim.keymap.set('n', '<C-b>', builtin.find_files, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})

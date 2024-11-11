@@ -1,38 +1,30 @@
 tap "homebrew/bundle"
-# Clone of cat(1) with syntax highlighting and Git integration
+tap "minamijoyo/hcledit"
 brew "bat"
-# Resource monitor. C++ version and continuation of bashtop and bpytop
 brew "btop"
-# Modern, maintained replacement for ls
 brew "eza"
-# Simple, fast and user-friendly alternative to find
 brew "fd"
-# User-friendly command-line shell for UNIX-like operating systems
 brew "fish"
-# Command-line fuzzy finder written in Go
 brew "fzf"
-# GitHub command-line tool
 brew "gh"
-# Syntax-highlighting pager for git and diff output
 brew "git-delta"
-# Render markdown on the CLI
 brew "glow"
-# Improved top (interactive process viewer)
 brew "htop"
-# Extraction utility for .zip compressed archives
 brew "unzip"
-# User-friendly cURL replacement (command-line HTTP client)
 brew "httpie"
-# Lightweight and flexible command-line JSON processor
 brew "jq"
-# Lazier way to manage everything docker
+brew "k9s"
 brew "lazydocker"
-# Search tool like grep and The Silver Searcher
+brew "minikube"
+brew "pipx"
+brew "psutils"
+brew "python@3.11"
 brew "ripgrep"
-# Programmatically correct mistyped console commands
+brew "terraform"
 brew "thefuck"
-# Shell extension to navigate your filesystem faster
+brew "tree"
 brew "zoxide"
+brew "minamijoyo/hcledit/hcledit"
 vscode "4ops.terraform"
 vscode "alefragnani.bookmarks"
 vscode "blinkshellinc.blink-fs"
