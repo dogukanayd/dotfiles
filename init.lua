@@ -12,6 +12,26 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+function CopyDynamicRelativePathAndLineToClipboard()
+  -- Get the absolute path of the current file
+  local full_path = vim.fn.expand('%:p') 
+  
+  -- Get the current working directory or the Git root directory
+  local base_path = vim.fn.systemlist('git rev-parse --show-toplevel')[1] or vim.fn.getcwd()
+  
+  -- Remove the base path from the full path to get the relative path
+  local relative_path = full_path:gsub('^' .. vim.pesc(base_path .. '/'), '')
+  
+  -- Get the current line number
+  local line_number = vim.fn.line('.')
+  
+  -- Combine the relative path with the line number
+  local content = relative_path .. ':' .. line_number
+  
+  -- Copy the result to the clipboard
+  vim.fn.setreg('+', content)
+end
+
 -- run :GoBuild or :GoTestCompile based on the go file
 local function build_go_files()
   if vim.endswith(vim.api.nvim_buf_get_name(0), "_test.go") then
@@ -776,6 +796,8 @@ vim.api.nvim_create_autocmd("TermOpen", {
     command = [[setlocal nonumber norelativenumber]]
 })
 
+-- copy the file path and the line number
+vim.api.nvim_set_keymap('n', '<leader>ca', [[:lua CopyDynamicRelativePathAndLineToClipboard()<CR>]], { noremap = true, silent = true })
 
 -- git.nvim
 vim.keymap.set('n', '<leader>gb', '<CMD>lua require("git.blame").blame()<CR>')
@@ -872,7 +894,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
     vim.keymap.set('n', '<leader>cl', vim.lsp.codelens.run, opts)
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set({'n', 'v'}, '<leader>ca', vim.lsp.buf.code_action, opts)
+    -- vim.keymap.set({'n', 'v'}, '<leader>ca', vim.lsp.buf.code_action, opts)
   end,
 })
 
