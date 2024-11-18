@@ -78,10 +78,23 @@ end
 --- plugins ---
 ----------------
 require("lazy").setup({
-  -- colorscheme
   {
     'jvirtanen/vim-hcl'
   },
+  {
+    -- PERF: fully optimised
+    -- HACK: hmm, this looks a bit funky
+    -- TODO: what else?
+    -- NOTE: adding a note
+    -- FIX: this needs fixing
+    -- WARNING: ???
+    --
+    "folke/todo-comments.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+    }
+  },
+  -- colorscheme
   {
     'sainnhe/gruvbox-material',
     config = function ()
@@ -828,7 +841,12 @@ vim.keymap.set('n', '<C-b>', builtin.find_files, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})
-vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
+-- vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>gg', function()
+  require('telescope.builtin').live_grep {
+    cwd = vim.fn.expand('%:p:h')  -- Sets the current file's directory as the root
+  }
+end, {})
 
 -- diagnostics
 vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float)
