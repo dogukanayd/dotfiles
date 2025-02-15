@@ -1,0 +1,18 @@
+[user]
+	name = dogukanayd
+[commit]
+	gpgsign = true
+[core]
+  pager = delta 
+
+[delta]
+  features = side-by-side
+  syntax-theme = gruvbox-dark 
+  line-numbers = true
+  decorations = always
+  max-line-length = 120 
+  
+
+[interactive]
+    diffFilter = delta --color-only
+

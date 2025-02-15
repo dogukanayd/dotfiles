@@ -91,6 +91,7 @@ alias http-usage="echo 'http POST http://example.com/api/endpoint < data.json'"
 alias docker-clean="docker system prune && docker container prune && docker network prune && docker image prune && docker volume prune"
 alias cat="bat"
 # alias vimo="nvim $(fzf)"
+alias vim="nvim"
 
 # Function to cd into a directory selected with fzf
 fcd() {
@@ -169,7 +170,7 @@ _fzf_compgen_dir() {
 
 
 export PATH=$PATH:/usr/local/go/bin
-export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$HOME/dogukanaydogdu/go/bin
 export PATH=$PATH:/home/dogukanaydogdu/.bin
 
 
@@ -178,5 +179,5 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
-source ~/fzf-git.sh/fzf-git.sh
+source ~/fzf-git.sh
 source $ZSH/oh-my-zsh.sh

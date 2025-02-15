@@ -79,6 +79,95 @@ end
 ----------------
 require("lazy").setup({
   {
+    "chrisbra/csv.vim",
+  },
+  {
+    -- Debug Adapter Protocol client implementation
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      -- Go extension for nvim-dap
+      "leoluz/nvim-dap-go",
+      -- UI for nvim-dap with required dependency
+      {
+        "rcarriga/nvim-dap-ui",
+        dependencies = {
+          "nvim-neotest/nvim-nio",
+        },
+      },
+    },
+    config = function()
+      -- Load the dap-go extension
+      require("dap-go").setup()
+
+      -- Load the dap-ui extension
+      require("dapui").setup()
+
+      -- Explicit setup for Go adapter
+      local dap = require("dap")
+      local dapui = require("dapui")
+
+      -- Configure the Go adapter for Delve
+      dap.adapters.go = function(callback, config)
+        callback({
+          type = "server",
+          host = "127.0.0.1",
+          port = 38697, -- Default Delve port
+        })
+      end
+
+      -- Define configurations for Go
+      dap.configurations.go = {
+        {
+          type = "go",
+          name = "Launch File",
+          request = "launch",
+          program = "${file}", -- Debug the current file
+        },
+        {
+          type = "go",
+          name = "Debug Package",
+          request = "launch",
+          program = "${fileDirname}", -- Debug the package
+        },
+        {
+          type = "go",
+          name = "Attach to Process",
+          request = "attach",
+          processId = require("dap.utils").pick_process,
+        },
+      }
+
+      -- Open dap-ui automatically when debugging starts
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+      end
+
+      -- Define key mappings for debugging
+      vim.api.nvim_set_keymap("n", "<F5>", "<Cmd>lua require'dap'.continue()<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<F10>", "<Cmd>lua require'dap'.step_over()<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<F11>", "<Cmd>lua require'dap'.step_into()<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<F12>", "<Cmd>lua require'dap'.step_out()<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<F2>", "<Cmd>lua require'dap'.toggle_breakpoint()<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<Leader>dt", "<Cmd>lua require'dap-go'.debug_test()<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<Leader>du", "<Cmd>lua require'dapui'.toggle()<CR>", { noremap = true, silent = true })
+
+      -- Set up breakpoint sign
+      vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+    end,
+  },
+
+
+  {
+    'airblade/vim-gitgutter',
+    -- also show the line numbers in the sign column
+  },
+  {
     'jvirtanen/vim-hcl'
   },
   {
