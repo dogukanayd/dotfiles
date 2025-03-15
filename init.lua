@@ -431,7 +431,7 @@ require("lazy").setup({
       require'lspconfig'.terraform_lsp.setup{}
       require'lspconfig'.intelephense.setup{}
       require'lspconfig'.ts_ls.setup{}
-
+      require'lspconfig'.yamlls.setup{}
       require("lspconfig").gopls.setup({
         capabilities = capabilities,
         flags = { debounce_text_changes = 200 },
@@ -930,12 +930,12 @@ vim.keymap.set('n', '<C-b>', builtin.find_files, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})
--- vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>gg', function()
-  require('telescope.builtin').live_grep {
-    cwd = vim.fn.expand('%:p:h')  -- Sets the current file's directory as the root
-  }
-end, {})
+vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
+-- vim.keymap.set('n', '<leader>gg', function()
+--   require('telescope.builtin').live_grep {
+--     cwd = vim.fn.expand('%:p:h')  -- Sets the current file's directory as the root
+--   }
+-- end, {})
 
 -- diagnostics
 vim.keymap.set('n', '<leader>do', vim.diagnostic.open_float)
@@ -950,7 +950,7 @@ vim.api.nvim_set_keymap('n', '<leader>cp', [[:let @+=fnamemodify(expand('%'), ':
 
 
 -- disable diagnostics, I didn't like them
-vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+-- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 
 -- Go uses gofmt, which uses tabs for indentation and spaces for aligment.
 -- Hence override our indentation rules.
@@ -1042,5 +1042,4 @@ vim.g.mkdp_auto_start = 1  -- Automatically open preview
 vim.g.mkdp_auto_close = 1  -- Automatically close preview when switching buffers
 vim.g.mkdp_browser = 'firefox'  -- or 'chrome', depending on your browser
 vim.g.mkdp_echo_preview_url = 1
-
 

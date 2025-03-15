@@ -29,8 +29,9 @@ if command -v tmux &> /dev/null; then
 
         # Create sessions with NeoVim in the first pane only for setup and notes sessions
         create_session_with_optional_nvim setup "$HOME/dotfiles" "$HOME/dotfiles" true
-        create_session_with_optional_nvim notes "$HOME/notes" "$HOME/notes" true
+        create_session_with_optional_nvim setup "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" false
         create_session_with_optional_nvim main "$HOME" "$HOME" false
+        create_session_with_optional_nvim ucd "$HOME" "$HOME" false
 
         # Attach to the main session
         tmux attach-session -t main
@@ -90,8 +91,12 @@ alias mockgen-usage="echo mockgen -destination=mock_cache.go -package=cache -sou
 alias http-usage="echo 'http POST http://example.com/api/endpoint < data.json'"
 alias docker-clean="docker system prune && docker container prune && docker network prune && docker image prune && docker volume prune"
 alias cat="bat"
+alias notes="cd /mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu"
 # alias vimo="nvim $(fzf)"
 alias vim="nvim"
+alias k="kubectl"
+alias aws-login="aws sso --profile atrium login" 
+alias kctx="kubectx"
 
 # Function to cd into a directory selected with fzf
 fcd() {
@@ -172,6 +177,7 @@ _fzf_compgen_dir() {
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/dogukanaydogdu/go/bin
 export PATH=$PATH:/home/dogukanaydogdu/.bin
+export PATH="$HOME/.local/bin:$PATH"
 
 
 export NVM_DIR="$HOME/.nvm"
@@ -181,3 +187,6 @@ export NVM_DIR="$HOME/.nvm"
 
 source ~/fzf-git.sh
 source $ZSH/oh-my-zsh.sh
+
+# ~/.zshrc
+eval "$(starship init zsh)"
