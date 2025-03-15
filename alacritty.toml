@@ -1,23 +1,31 @@
-# import = ["~/.config/alacritty/themes/gruvbox-dark.toml"] 
-
 [font]
-size = 13  # Adjust font size to your liking
+size = 15  # Adjust font size to your liking
 
 [font.normal]
-family = "JetBrainsMono Nerd Font"  # Replace with your preferred font
-style = "Regular"
+family = "OperatorMono Nerd Font"  # Replace with your preferred font
+style = "Medium"
 
 [font.bold]
-family = "JetBrainsMono Nerd Font"  # Replace with your preferred font
-style = "Bold"
+family = "OperatorMono Nerd Font"  # Replace with your preferred font
+style = "Medium"
 
 [font.italic]
-family = "JetBrainsMono Nerd Font"  # Replace with your preferred font
-style = "Italic"
+family = "OperatorMono Nerd Font"  # Replace with your preferred font
+style = "Medium"
 
 [env]
 TERM = "xterm-256color"
 
 [window]
 option_as_alt = "Both" # to use the option key as alt on mac os x
+
+[key_bindings]
+# Copy with Ctrl+Shift+C
+key_1 = { key = "C", mods = "Control|Shift", action = "Copy" }
+
+# Paste with Ctrl+Shift+V
+key_2 = { key = "V", mods = "Control|Shift", action = "Paste" }
+
+[mouse]
+enabled = true  # Enable mouse support for selection
 
