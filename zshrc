@@ -173,6 +173,11 @@ _fzf_compgen_dir() {
   fd --type=d --hidden --exclude .git . "$1"
 }
 
+# Set GOROOT (Go installation location)
+export GOROOT=/usr/local/go
+
+# Set GOPATH (your Go workspace)
+export GOPATH=$HOME/dogukanaydogdu/go
 
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:$HOME/dogukanaydogdu/go/bin
