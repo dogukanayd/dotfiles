@@ -161,7 +161,38 @@ require("lazy").setup({
       vim.fn.sign_define("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
     end,
   },
+  {
+    'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
+      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+    },
+    init = function() vim.g.barbar_auto_setup = false end,
+    config = function()
+      require('barbar').setup({
+        animation = true,
+        auto_hide = false,
+        tabpages = true,
+        clickable = true,
+      })
 
+      -- Keymaps
+      local map = vim.keymap.set
+      local opts = { noremap = true, silent = true, desc = "barbar keymap" }
+
+      map('n', '<A-,>', '<Cmd>BufferPrevious<CR>', opts)
+      map('n', '<A-.>', '<Cmd>BufferNext<CR>', opts)
+      map('n', '<A-<>', '<Cmd>BufferMovePrevious<CR>', opts)
+      map('n', '<A->>', '<Cmd>BufferMoveNext<CR>', opts)
+      map('n', '<A-c>', '<Cmd>BufferClose<CR>', opts)
+      map('n', '<A-p>', '<Cmd>BufferPick<CR>', opts)
+
+      for i = 1, 9 do
+        map('n', '<A-' .. i .. '>', '<Cmd>BufferGoto ' .. i .. '<CR>', opts)
+      end
+      map('n', '<A-0>', '<Cmd>BufferLast<CR>', opts)
+    end,
+  },
 
   {
     'airblade/vim-gitgutter',
@@ -1039,6 +1070,18 @@ vim.api.nvim_create_autocmd('FileType', {
   group = qfgroup,
   command = 'setlocal wrap',
 })
+
+-- add a newline at the end of the file
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function()
+    local last_line = vim.api.nvim_buf_get_lines(0, -2, -1, false)[1]
+    if last_line ~= "" then
+      vim.api.nvim_buf_set_lines(0, -1, -1, false, {""})
+    end
+  end,
+})
+
 
 -- markdown
 vim.g.mkdp_auto_start = 1  -- Automatically open preview
