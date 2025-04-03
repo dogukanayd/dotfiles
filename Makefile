@@ -11,6 +11,8 @@ sync:
 	# config for the glow
 	[ ! -f ~/.config/glow/glow.yml ] || rm -f ~/.config/glow/glow.yml
 	ln -sf /home/dogukanaydogdu/dotfiles/glow.yml ~/.config/glow/glow.yml
+	[ ! -f ~/.config/starship.toml ] || rm -f ~/.config/starship.toml
+	ln -sf /home/dogukanaydogdu/dotfiles/starship.toml ~/.config/starship.toml
 	[ ! -f ~/.tmux.conf ] || rm -f ~/.tmux.conf
 	ln -sf /home/dogukanaydogdu/dotfiles/tmux.conf ~/.tmux.conf
 	[ ! -f ~/.gitconfig ] || rm -f ~/.gitconfig
