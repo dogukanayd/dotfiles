@@ -3,6 +3,7 @@ all: sync
 sync:
 	mkdir -p ~/.config/nvim
 	mkdir -p ~/.tmux/
+	mkdir -p ~/.config/glow
 	# Remove existing files before creating new symlinks
 	[ ! -f ~/.vimrc ] || rm -f ~/.vimrc
 	ln -sf /home/dogukanaydogdu/dotfiles/vimrc ~/.vimrc
@@ -11,12 +12,16 @@ sync:
 	# config for the glow
 	[ ! -f ~/.config/glow/glow.yml ] || rm -f ~/.config/glow/glow.yml
 	ln -sf /home/dogukanaydogdu/dotfiles/glow.yml ~/.config/glow/glow.yml
+	# config for the starship
 	[ ! -f ~/.config/starship.toml ] || rm -f ~/.config/starship.toml
 	ln -sf /home/dogukanaydogdu/dotfiles/starship.toml ~/.config/starship.toml
+	# config for the tmux
 	[ ! -f ~/.tmux.conf ] || rm -f ~/.tmux.conf
 	ln -sf /home/dogukanaydogdu/dotfiles/tmux.conf ~/.tmux.conf
+	# config for the .git
 	[ ! -f ~/.gitconfig ] || rm -f ~/.gitconfig
 	ln -sf /home/dogukanaydogdu/dotfiles/gitconfig ~/.gitconfig
+	# config for the zsh
 	[ ! -f ~/.zshrc ] || rm -f ~/.zshrc  # Fixed spacing here
 	ln -sf /home/dogukanaydogdu/dotfiles/zshrc ~/.zshrc
 	[ ! -f ~/.alacritty.toml ] || rm -f ~/.alacritty.toml  # Fixed spacing here

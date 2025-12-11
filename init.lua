@@ -357,15 +357,15 @@ require("lazy").setup({
   },
 
   -- copilot
-  {
+   {
     'github/copilot.vim',
-    config = function()
-      -- Disable Copilot’s default Tab mapping
+     config = function()
+       -- Disable Copilot’s default Tab mapping
       vim.g.copilot_no_tab_map = true
 
-      -- Set custom key mapping to accept Copilot suggestion
+       -- Set custom key mapping to accept Copilot suggestion
       vim.api.nvim_set_keymap("i", "<C-l>", 'copilot#Accept("<CR>")', { expr = true, silent = true })
-    end,
+     end,
   },
 
   -- markdown
@@ -431,6 +431,31 @@ require("lazy").setup({
               filename = entry.filename,
             })
           end,
+          -- Add these settings for better live grep performance
+          vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+            "--hidden",
+            "--glob=!.git/*",
+          },
+        },
+        pickers = {
+          live_grep = {
+            -- Additional options for live grep
+            only_sort_text = true,
+            search_dirs = nil, -- Search in current directory by default
+            grep_open_files = false,
+            prompt_title = "Live Grep",
+            results_title = "Search Results",
+            preview_title = "Preview",
+            -- Use ripgrep for better performance
+            find_command = { "rg", "--files" },
+          },
         },
         extensions = {
           fzf = {
@@ -964,7 +989,51 @@ vim.keymap.set('n', '<C-b>', builtin.find_files, {})
 vim.keymap.set('n', '<C-g>', builtin.lsp_document_symbols, {})
 vim.keymap.set('n', '<leader>td', builtin.diagnostics, {})
 vim.keymap.set('n', '<leader>gs', builtin.grep_string, {})
-vim.keymap.set('n', '<leader>gg', builtin.live_grep, {})
+-- Live grep in current directory
+vim.keymap.set('n', '<leader>gg', function()
+  require('telescope.builtin').live_grep({
+    prompt_title = "Live Grep (Current Dir)",
+    results_title = "Search Results",
+    preview_title = "Preview",
+    -- Search in current directory by default
+    search_dirs = { vim.fn.expand('%:p:h') },
+    -- Use ripgrep with additional options
+    vimgrep_arguments = {
+      "rg",
+      "--color=never",
+      "--no-heading",
+      "--with-filename",
+      "--line-number",
+      "--column",
+      "--smart-case",
+      "--hidden",
+      "--glob=!.git/*",
+    },
+  })
+end, {})
+
+-- Live grep everywhere (global search)
+vim.keymap.set('n', '<leader>gG', function()
+  require('telescope.builtin').live_grep({
+    prompt_title = "Live Grep (Global)",
+    results_title = "Search Results",
+    preview_title = "Preview",
+    -- Search everywhere
+    search_dirs = nil,
+    -- Use ripgrep with additional options
+    vimgrep_arguments = {
+      "rg",
+      "--color=never",
+      "--no-heading",
+      "--with-filename",
+      "--line-number",
+      "--column",
+      "--smart-case",
+      "--hidden",
+      "--glob=!.git/*",
+    },
+  })
+end, {})
 -- vim.keymap.set('n', '<leader>gg', function()
 --   require('telescope.builtin').live_grep {
 --     cwd = vim.fn.expand('%:p:h')  -- Sets the current file's directory as the root
@@ -1086,6 +1155,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- markdown
 vim.g.mkdp_auto_start = 1  -- Automatically open preview
 vim.g.mkdp_auto_close = 1  -- Automatically close preview when switching buffers
-vim.g.mkdp_browser = 'firefox'  -- or 'chrome', depending on your browser
+vim.g.mkdp_browser = 'chrome'  -- or 'chrome', depending on your browser
 vim.g.mkdp_echo_preview_url = 1
 

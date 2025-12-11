@@ -1,6 +1,35 @@
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export COLORTERM=truecolor
+export TERM=xterm-256color   # or 'alacritty'
+
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 zstyle ':omz:update' mode auto      # update automatically without asking
+
+# Ensure ssh-agent is running and your signing key is loaded
+
+SSH_KEY="$HOME/.ssh/id_ed25519_git_signing"
+
+# If SSH agent not running, start it and export its variables
+if [ -z "$SSH_AUTH_SOCK" ] || ! ps -p "$SSH_AGENT_PID" > /dev/null 2>&1; then
+  eval "$(ssh-agent -s)" > /dev/null
+fi
+
+# Add the signing key if not already added
+if ! ssh-add -l | grep -q "$SSH_KEY"; then
+  ssh-add "$SSH_KEY" > /dev/null 2>&1
+fi
+
+
+# Ensure VS Code Windows CLI is on PATH when missing
+if ! command -v code >/dev/null 2>&1; then
+  WIN_LOCALAPPDATA="$(cmd.exe /c echo %LOCALAPPDATA% 2>/dev/null | tr -d '\r')"
+  WIN_LOCALAPPDATA_WSL="$(wslpath "$WIN_LOCALAPPDATA" 2>/dev/null)"
+  if [ -n "$WIN_LOCALAPPDATA_WSL" ] && [ -d "$WIN_LOCALAPPDATA_WSL/Programs/Microsoft VS Code/bin" ]; then
+    export PATH="$PATH:$WIN_LOCALAPPDATA_WSL/Programs/Microsoft VS Code/bin"
+  fi
+fi
 
 # Automatically set up tmux sessions
 if command -v tmux &> /dev/null; then
@@ -29,12 +58,12 @@ if command -v tmux &> /dev/null; then
 
         # Create sessions with NeoVim in the first pane only for setup and notes sessions
         create_session_with_optional_nvim setup "$HOME/dotfiles" "$HOME/dotfiles" true
-        create_session_with_optional_nvim setup "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" false
-        create_session_with_optional_nvim main "$HOME" "$HOME" false
+        # create_session_with_optional_nvim setup "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" false
+        # create_session_with_optional_nvim main "$HOME" "$HOME" false
         create_session_with_optional_nvim ucd "$HOME" "$HOME" false
 
         # Attach to the main session
-        tmux attach-session -t main
+        tmux attach-session -t ucd
     fi
 fi
 
@@ -174,16 +203,31 @@ _fzf_compgen_dir() {
   fd --type=d --hidden --exclude .git . "$1"
 }
 
-# Set GOROOT (Go installation location)
-export GOROOT=/usr/local/go
+# # Go installation directory
+# export GOROOT=/usr/local/go
+#
+# # GOPATH workspace
+# export GOPATH=$HOME/go
+#
+# # Update PATH
+export PATH=$PATH:$GOROOT/bin
+export PATH=$PATH:$GOPATH/bin
+#
+#
+# export PATH=$PATH:/home/dogukanaydogdu/.bin
+# export PATH="$HOME/.local/bin:$PATH"
+# export PATH=$PATH:/home/dogukanaydogdu/go/bin
+#
 
-# Set GOPATH (your Go workspace)
-export GOPATH=$HOME/dogukanaydogdu/go
+# --- Go setup (no hardcoded GOROOT) ---
+export GOPATH="$HOME/go"
 
-export PATH=$PATH:/usr/local/go/bin
-export PATH=$PATH:$HOME/dogukanaydogdu/go/bin
-export PATH=$PATH:/home/dogukanaydogdu/.bin
-export PATH="$HOME/.local/bin:$PATH"
+# Prefer Go 1.23.9 toolchain installed via `go1.23.9 download`
+export PATH="$HOME/sdk/go1.23.9/bin:$GOPATH/bin:$HOME/.local/bin:$HOME/.bin:$PATH"
+
+# Let the Go tool auto-select the repo's requested toolchain
+export GOTOOLCHAIN=auto
+
 
 
 export NVM_DIR="$HOME/.nvm"
