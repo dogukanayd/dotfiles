@@ -451,12 +451,23 @@ require("lazy").setup({
         defaults = {
           wrap_results = true,
           layout_strategy = 'horizontal',
-          path_display = {'absolute'},
+          path_display = function(opts, path)
+            -- Get git root or fallback to cwd
+            local git_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
+            if vim.v.shell_error ~= 0 then
+              git_root = vim.fn.getcwd()
+            end
+            -- Make path relative to git root
+            local relative_path = path:gsub('^' .. vim.pesc(git_root .. '/'), '')
+            return relative_path
+          end,
           layout_config = {
             horizontal = {
-              preview_width = 0.6,
+              preview_width = 0.5,
+              results_width = 0.5,
             },
-            width = 0.9,
+            width = 0.95,
+            height = 0.9,
           },
           entry_maker = function(entry)
             local display = entry.filename
@@ -481,6 +492,17 @@ require("lazy").setup({
           },
         },
         pickers = {
+          lsp_references = {
+            layout_config = {
+              horizontal = {
+                preview_width = 0.6,
+              },
+              width = 0.95,
+              height = 0.9,
+            },
+            show_line = false,
+            trim_text = true,
+          },
           live_grep = {
             -- Additional options for live grep
             only_sort_text = true,
@@ -1168,7 +1190,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', '<leader>v', "<cmd>vsplit | lua vim.lsp.buf.definition()<CR>", opts)
     vim.keymap.set('n', '<leader>s', "<cmd>belowright split | lua vim.lsp.buf.definition()<CR>", opts)
 
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', 'gr', function() require('telescope.builtin').lsp_references() end, opts)
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
