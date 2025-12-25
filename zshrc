@@ -63,7 +63,7 @@ if command -v tmux &> /dev/null; then
         create_session_with_optional_nvim ucd "$HOME" "$HOME" false
 
         # Attach to the main session
-        tmux attach-session -t ucd
+        #tmux attach-session -t ucd
     fi
 fi
 
@@ -84,9 +84,13 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git kube-ps1)
 
 source $ZSH/oh-my-zsh.sh
+
+# Show kubernetes context in right prompt
+KUBE_PS1_SYMBOL_ENABLE=false
+RPROMPT='$(kube_ps1)'
 
 # User configuration
 
@@ -125,6 +129,7 @@ alias notes="cd /mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu
 alias vim="nvim"
 alias k="kubectl"
 alias aws-login="aws sso --profile atrium login" 
+alias ecr-login="aws ecr --profile atrium get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 936289044322.dkr.ecr.eu-west-1.amazonaws.com"
 alias kctx="kubectx"
 
 # Function to cd into a directory selected with fzf
@@ -239,5 +244,8 @@ source ~/fzf-git.sh
 source $ZSH/oh-my-zsh.sh
 
 # ~/.zshrc
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
 
+
+# Claude Code Telemetry
+[ -f "$HOME/.claude/env" ] && source "$HOME/.claude/env"

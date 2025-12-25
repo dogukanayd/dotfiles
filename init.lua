@@ -81,6 +81,69 @@ require("lazy").setup({
   {
     "chrisbra/csv.vim",
   },
+
+  -- Show keybindings popup
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("which-key").setup({})
+    end,
+  },
+
+  -- Surround text with quotes, brackets, etc.
+  {
+    "kylechui/nvim-surround",
+    version = "*",
+    event = "VeryLazy",
+    config = function()
+      require("nvim-surround").setup({})
+    end,
+  },
+
+  -- Fast navigation/jumping
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+    },
+  },
+
+  -- Git diff view
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("diffview").setup({})
+    end,
+  },
+
+  -- Undo tree visualization
+  {
+    "mbbill/undotree",
+    config = function()
+      vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = "Toggle Undotree" })
+    end,
+  },
+  {
+    "greggh/claude-code.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      require("claude-code").setup({
+        keymaps = {
+          toggle = {
+            normal = "<leader>ai",
+            terminal = "<leader>ai",
+          },
+        },
+      })
+    end,
+  },
   {
     -- Debug Adapter Protocol client implementation
     "mfussenegger/nvim-dap",
@@ -96,46 +159,14 @@ require("lazy").setup({
       },
     },
     config = function()
-      -- Load the dap-go extension
+      -- Load the dap-go extension (handles adapter and configurations automatically)
       require("dap-go").setup()
 
       -- Load the dap-ui extension
       require("dapui").setup()
 
-      -- Explicit setup for Go adapter
       local dap = require("dap")
       local dapui = require("dapui")
-
-      -- Configure the Go adapter for Delve
-      dap.adapters.go = function(callback, config)
-        callback({
-          type = "server",
-          host = "127.0.0.1",
-          port = 38697, -- Default Delve port
-        })
-      end
-
-      -- Define configurations for Go
-      dap.configurations.go = {
-        {
-          type = "go",
-          name = "Launch File",
-          request = "launch",
-          program = "${file}", -- Debug the current file
-        },
-        {
-          type = "go",
-          name = "Debug Package",
-          request = "launch",
-          program = "${fileDirname}", -- Debug the package
-        },
-        {
-          type = "go",
-          name = "Attach to Process",
-          request = "attach",
-          processId = require("dap.utils").pick_process,
-        },
-      }
 
       -- Open dap-ui automatically when debugging starts
       dap.listeners.after.event_initialized["dapui_config"] = function()
@@ -320,6 +351,7 @@ require("lazy").setup({
         sort_by = "case_sensitive",
         filters = {
           dotfiles = false,
+          git_ignored = false,
         },
         on_attach = function(bufnr)
           local api = require('nvim-tree.api')
@@ -487,7 +519,7 @@ require("lazy").setup({
       local capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
       capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-      require'lspconfig'.terraform_lsp.setup{}
+      require'lspconfig'.terraformls.setup{}
       require'lspconfig'.intelephense.setup{}
       require'lspconfig'.ts_ls.setup{}
       require'lspconfig'.yamlls.setup{}
@@ -804,6 +836,7 @@ vim.opt.autochdir = true     -- Change CWD when I open a file
 vim.opt.mouse = 'a'                -- Enable mouse support
 vim.opt.clipboard = 'unnamedplus'  -- Copy/paste to system clipboard
 vim.opt.swapfile = false           -- Don't use swapfile
+vim.opt.autoread = true            -- Auto reload file when changed externally
 vim.opt.ignorecase = true          -- Search case insensitive...
 vim.opt.smartcase = true           -- ... but not it begins with upper case 
 vim.opt.completeopt = 'menuone,noinsert,noselect'  -- Autocomplete options
@@ -975,6 +1008,10 @@ vim.api.nvim_create_user_command("GBrowse", 'lua require("git.browse").open(true
 -- File-tree mappings
 vim.keymap.set('n', '<leader>n', ':NvimTreeToggle<CR>', { noremap = true })
 vim.keymap.set('n', '<leader>f', ':NvimTreeFindFile!<CR>', { noremap = true })
+
+-- Buffer navigation
+vim.keymap.set('n', '<leader>h', '<Cmd>BufferPrevious<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>l', '<Cmd>BufferNext<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<M-n>', [[:lua EnterResizeMode()<CR>]], { noremap = true, silent = true })
 
 -- vim-test
@@ -1010,6 +1047,21 @@ vim.keymap.set('n', '<leader>gg', function()
       "--glob=!.git/*",
     },
   })
+end, {})
+
+-- Live grep in a specific directory (prompts for path, relative to git root)
+vim.keymap.set('n', '<leader>gd', function()
+  -- Get git root directory
+  local git_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
+  if vim.v.shell_error ~= 0 then
+    git_root = vim.fn.getcwd()
+  end
+
+  local dir = vim.fn.input("Directory (from " .. git_root .. "): ", "", "dir")
+  if dir ~= "" then
+    local search_path = git_root .. "/" .. dir
+    require('telescope.builtin').live_grep({ search_dirs = { search_path } })
+  end
 end, {})
 
 -- Live grep everywhere (global search)
@@ -1052,8 +1104,14 @@ vim.keymap.set('n', '<leader>b', build_go_files)
 vim.api.nvim_set_keymap('n', '<leader>cp', [[:let @+=fnamemodify(expand('%'), ':~:.')<CR>]], { noremap = true, silent = true })
 
 
--- disable diagnostics, I didn't like them
--- vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
+-- LSP Diagnostics configuration
+vim.diagnostic.config({
+  virtual_text = true,      -- Show error message at end of line
+  signs = true,             -- Show signs in the sign column
+  underline = true,         -- Underline problematic code
+  update_in_insert = false, -- Don't update diagnostics in insert mode
+  severity_sort = true,     -- Sort diagnostics by severity
+})
 
 -- Go uses gofmt, which uses tabs for indentation and spaces for aligment.
 -- Hence override our indentation rules.
@@ -1110,6 +1168,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 -- automatically resize all vim buffers if I resize the terminal window
 vim.api.nvim_command('autocmd VimResized * wincmd =')
+
+-- Auto reload files when changed externally
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  pattern = "*",
+  command = "if mode() != 'c' | checktime | endif",
+})
 
 -- https://github.com/neovim/neovim/issues/21771
 local exitgroup = vim.api.nvim_create_augroup('setDir', { clear = true })
