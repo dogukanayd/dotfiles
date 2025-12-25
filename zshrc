@@ -32,40 +32,39 @@ if ! command -v code >/dev/null 2>&1; then
 fi
 
 # Automatically set up tmux sessions
-if command -v tmux &> /dev/null; then
-    # Check if tmux is already running
-    if [ -z "$TMUX" ]; then
-        # Function to create a session with two horizontal panes and selectively open NeoVim
-        create_session_with_optional_nvim() {
-            local session_name=$1
-            local dir1=$2
-            local dir2=$3
-            local open_nvim_in_first_pane=$4
-
-            # Create the session if it doesn't exist
-            tmux has-session -t "$session_name" 2>/dev/null || {
-                if [ "$open_nvim_in_first_pane" = true ]; then
-                    # Start the first pane with NeoVim in the specified directory
-                    tmux new-session -d -s "$session_name" "cd $dir1 && nvim"
-                else
-                    # Start the first pane as a regular shell in the specified directory
-                    tmux new-session -d -s "$session_name" -c "$dir1"
-                fi
-                # Split the window into two horizontal panes with the second pane as a regular shell
-                tmux split-window -v -t "$session_name" -c "$dir2"
-            }
-        }
-
-        # Create sessions with NeoVim in the first pane only for setup and notes sessions
-        create_session_with_optional_nvim setup "$HOME/dotfiles" "$HOME/dotfiles" true
-        # create_session_with_optional_nvim setup "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" "/mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu" false
-        # create_session_with_optional_nvim main "$HOME" "$HOME" false
-        create_session_with_optional_nvim ucd "$HOME" "$HOME" false
-
-        # Attach to the main session
-        #tmux attach-session -t ucd
-    fi
-fi
+# if command -v tmux &> /dev/null; then
+#     # Check if tmux is already running
+#     if [ -z "$TMUX" ]; then
+#         # Function to create a session with two horizontal panes and selectively open NeoVim
+#         create_session_with_optional_nvim() {
+#             local session_name=$1
+#             local dir1=$2
+#             local dir2=$3
+#             local open_nvim_in_first_pane=$4
+#
+#             # Create the session if it doesn't exist
+#             tmux has-session -t "$session_name" 2>/dev/null || {
+#                 if [ "$open_nvim_in_first_pane" = true ]; then
+#                     # Start the first pane with NeoVim in the specified directory
+#                     tmux new-session -d -s "$session_name" "cd $dir1 && nvim"
+#                 else
+#                     # Start the first pane as a regular shell in the specified directory
+#                     tmux new-session -d -s "$session_name" -c "$dir1"
+#                 fi
+#                 # Split the window into two horizontal panes with the second pane as a regular shell
+#                 tmux split-window -v -t "$session_name" -c "$dir2"
+#             }
+#         }
+#
+#         # Create sessions with NeoVim in the first pane only for setup and notes sessions
+#         create_session_with_optional_nvim setup "$HOME/dotfiles" "$HOME/dotfiles" true
+#         # create_session_with_optional_nvim main "$HOME" "$HOME" false
+#         create_session_with_optional_nvim ucd "$HOME" "$HOME" false
+#
+#         # Attach to the main session
+#         #tmux attach-session -t ucd
+#     fi
+# fi
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -124,7 +123,6 @@ alias mockgen-usage="echo mockgen -destination=mock_cache.go -package=cache -sou
 alias http-usage="echo 'http POST http://example.com/api/endpoint < data.json'"
 alias docker-clean="docker system prune && docker container prune && docker network prune && docker image prune && docker volume prune"
 alias cat="bat"
-alias notes="cd /mnt/c/Users/doguk/iCloudDrive/iCloud~md~obsidian/dogukanaydogdu"
 # alias vimo="nvim $(fzf)"
 alias vim="nvim"
 alias k="kubectl"
@@ -160,7 +158,12 @@ weather () {
   curl https://wttr.in/$city
 }
 
-eval $(thefuck --alias)
+# Lazy load thefuck for faster shell startup
+fuck() {
+  unset -f fuck
+  eval $(thefuck --alias)
+  fuck "$@"
+}
 
 # setup fzf key bindings and fuzzy completion
 eval "$(fzf --zsh)"
@@ -236,8 +239,13 @@ export GOTOOLCHAIN=auto
 
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Lazy load nvm for faster shell startup
+nvm() {
+  unset -f nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  nvm "$@"
+}
 
 
 source ~/fzf-git.sh
@@ -249,3 +257,4 @@ source $ZSH/oh-my-zsh.sh
 
 # Claude Code Telemetry
 [ -f "$HOME/.claude/env" ] && source "$HOME/.claude/env"
+

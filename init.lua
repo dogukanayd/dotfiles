@@ -263,7 +263,11 @@ require("lazy").setup({
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function ()
       require("lualine").setup({
-        options = { theme = 'gruvbox' },
+        options = {
+          theme = 'palenight',  -- Material design purple theme
+          component_separators = { left = '', right = ''},
+          section_separators = { left = '', right = ''},
+        },
         sections = {
           lualine_c = {
             {
@@ -851,10 +855,12 @@ vim.opt.expandtab = true  -- expand tabs into spaces
 vim.opt.shiftwidth = 2    -- number of spaces to use for each step of indent.
 vim.opt.tabstop = 2       -- number of spaces a TAB counts for
 vim.opt.autoindent = true -- copy indent from current line when starting a new line
-vim.opt.wrap = true
+vim.opt.wrap = false
 
 vim.opt.ruler = true
 vim.opt.colorcolumn = "120"  -- Replace 120 with your preferred column number
+vim.opt.cmdheight = 0        -- Remove command line space at the bottom
+vim.opt.laststatus = 3       -- Global statusline
 
 -- This comes first, because we have mappings that depend on leader
 -- With a map leader it's possible to do extra key combinations
@@ -953,7 +959,7 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "TermOpen" }, {
     callback = function(args)
         -- we don't use vim.startswith() and look for test:// because of vim-test
         -- vim-test starts tests in a terminal, which we want to keep in normal mode
-        if vim.endswith(vim.api.nvim_buf_get_name(args.buf), "fish") then
+        if vim.endswith(vim.api.nvim_buf_get_name(args.buf), "zsh") then
             vim.cmd("startinsert")
         end
     end,
@@ -1066,12 +1072,18 @@ end, {})
 
 -- Live grep everywhere (global search)
 vim.keymap.set('n', '<leader>gG', function()
+  -- Get git root directory
+  local git_root = vim.fn.systemlist('git rev-parse --show-toplevel')[1]
+  if vim.v.shell_error ~= 0 then
+    git_root = vim.fn.getcwd()
+  end
+
   require('telescope.builtin').live_grep({
     prompt_title = "Live Grep (Global)",
     results_title = "Search Results",
     preview_title = "Preview",
-    -- Search everywhere
-    search_dirs = nil,
+    -- Search from git root or fallback to cwd
+    cwd = git_root,
     -- Use ripgrep with additional options
     vimgrep_arguments = {
       "rg",
