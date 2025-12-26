@@ -82,6 +82,30 @@ require("lazy").setup({
     "chrisbra/csv.vim",
   },
 
+  -- HTTP client for .http files
+  {
+    'mistweaverco/kulala.nvim',
+    ft = 'http',
+    keys = {
+      { "<leader>rr", "", desc = "Send the request" },
+      { "<leader>rt", "", desc = "Toggle headers/body" },
+      { "<leader>rc", "", desc = "Copy as curl" },
+    },
+    config = function()
+      require('kulala').setup({
+        default_view = "body",
+        default_env = "dev",
+        formatters = {
+          json = { "jq", "." },
+        },
+        -- Disable verbose and user agent for cleaner curl
+        curl_options = {
+          user_agent = nil,
+        },
+      })
+    end,
+  },
+
   -- Show keybindings popup
   {
     "folke/which-key.nvim",
@@ -640,6 +664,7 @@ require("lazy").setup({
           'fish',
           'go',
           'gomod',
+          'http',
           'json',
           'lua',
           'markdown',
@@ -724,7 +749,7 @@ require("lazy").setup({
           -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
           -- Using this option may slow down your editor, and you may see some duplicate highlights.
           -- Instead of true it can also be a list of languages
-          additional_vim_regex_highlighting = false,
+          additional_vim_regex_highlighting = { 'http' },
         },
       })
     end,
@@ -1046,6 +1071,56 @@ vim.api.nvim_set_keymap('n', '<M-n>', [[:lua EnterResizeMode()<CR>]], { noremap 
 vim.keymap.set('n', '<leader>tt', ':TestNearest -v<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>tf', ':TestFile -v<CR>', { noremap = true, silent = true })
 
+-- kulala.nvim (HTTP client)
+-- Function to copy clean curl command in readable format
+local function copy_clean_curl()
+  require('kulala').copy()
+  local curl_cmd = vim.fn.getreg('+')
+
+  -- Extract URL
+  local url = curl_cmd:match("'([^']+)'%s*$") or curl_cmd:match('"([^"]+)"%s*$')
+
+  -- Extract headers
+  local headers = {}
+  for header in curl_cmd:gmatch("%-H%s+'([^']+)'") do
+    if not header:match("^Content%-Length:") and not header:match("^Host:") then
+      table.insert(headers, header)
+    end
+  end
+
+  -- Extract method
+  local method = curl_cmd:match("%-X%s+'([^']+)'") or curl_cmd:match("%-X%s+([A-Z]+)")
+
+  -- Extract data
+  local data = curl_cmd:match("%-%-data%-binary%s+'([^']+)'") or curl_cmd:match("%-%-data%-binary%s+(.+)%s+'http")
+  if not data then
+    data = curl_cmd:match("%-d%s+'([^']+)'")
+  end
+
+  -- Build clean curl command
+  local clean_curl = "curl --location '" .. url .. "'"
+
+  -- Add headers
+  for _, header in ipairs(headers) do
+    clean_curl = clean_curl .. " \\\n--header '" .. header .. "'"
+  end
+
+  -- Add data if exists
+  if data then
+    -- Clean up the data
+    data = data:gsub("^%s+", ""):gsub("%s+$", "")
+    clean_curl = clean_curl .. " \\\n--data '" .. data .. "'"
+  end
+
+  vim.fn.setreg('+', clean_curl)
+  print("Clean curl command copied to clipboard")
+end
+
+vim.keymap.set('n', '<leader>rr', function() require('kulala').run() end, { desc = "Run HTTP request" })
+vim.keymap.set('n', '<leader>ra', function() require('kulala').run_all() end, { desc = "Run all HTTP requests" })
+vim.keymap.set('n', '<leader>ri', function() require('kulala').inspect() end, { desc = "Inspect HTTP request" })
+vim.keymap.set('n', '<leader>rt', function() require('kulala').toggle_view() end, { desc = "Toggle HTTP response view" })
+vim.keymap.set('n', '<leader>rc', copy_clean_curl, { desc = "Copy clean curl command" })
 
 -- telescope
 local builtin = require('telescope.builtin')
@@ -1145,6 +1220,22 @@ vim.diagnostic.config({
   underline = true,         -- Underline problematic code
   update_in_insert = false, -- Don't update diagnostics in insert mode
   severity_sort = true,     -- Sort diagnostics by severity
+})
+
+-- Filetype detection for .http files
+vim.filetype.add({
+  extension = {
+    http = 'http',
+  },
+})
+
+-- Enable syntax highlighting for .http files
+vim.api.nvim_create_autocmd({'BufRead', 'BufNewFile'}, {
+  pattern = '*.http',
+  callback = function()
+    vim.bo.filetype = 'http'
+    vim.cmd('syntax enable')
+  end,
 })
 
 -- Go uses gofmt, which uses tabs for indentation and spaces for aligment.
