@@ -86,11 +86,6 @@ require("lazy").setup({
   {
     'mistweaverco/kulala.nvim',
     ft = 'http',
-    keys = {
-      { "<leader>rr", "", desc = "Send the request" },
-      { "<leader>rt", "", desc = "Toggle headers/body" },
-      { "<leader>rc", "", desc = "Copy as curl" },
-    },
     config = function()
       require('kulala').setup({
         default_view = "body",
@@ -102,6 +97,19 @@ require("lazy").setup({
         curl_options = {
           user_agent = nil,
         },
+        -- Skip SSL verification (for WSL/corporate proxy environments)
+        -- additional_curl_options = { "-k" },
+      })
+      -- Disable folding in kulala response buffers
+      vim.api.nvim_create_autocmd("BufWinEnter", {
+        callback = function()
+          if vim.bo.filetype:match("kulala") then
+            vim.opt_local.foldenable = false
+            vim.opt_local.foldmethod = "manual"
+            vim.opt_local.foldlevel = 99
+            vim.cmd("normal! zR")
+          end
+        end,
       })
     end,
   },
